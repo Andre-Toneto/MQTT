@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MQTT Web Test</title>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+<body>
+  <h1>MQTT WebSocket</h1>
+
+  <input type="text" id="messageInput" placeholder="Digite sua mensagem" />
+  <button onclick="sendMessage()">Enviar Mensagem</button>
+
+  <h2>Mensagens Recebidas:</h2>
+  <ul id="messagesList"></ul>
+
+  <script>
+    const client = mqtt.connect('ws://192.168.100.211:9001'); // seu IP local e porta WebSocket
+
+    client.on('connect', () => {
+      console.log('Conectado via WebSocket!');
+      client.subscribe('/messages');
+    });
+
+    client.on('message', (topic, message) => {
+      console.log(`Mensagem de ${topic}: ${message.toString()}`);
+      const li = document.createElement('li');
+      li.textContent = `[${topic}] ${message.toString()}`;
+      document.getElementById('messagesList').appendChild(li);
+    });
+
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      if (message) {
+        client.publish('/messages', message);
+        input.value = '';
+      }
+    }
+  </script>
+</body>
+</html>
